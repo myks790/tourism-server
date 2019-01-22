@@ -22,14 +22,17 @@ public class Plan {
 
     private Integer period;
 
-    @OneToMany
+    @ManyToMany
     @JoinColumn(name = "plan_id")
-    private List<Category> extraCategories;
+    private List<Category> categories;
 
     private Boolean shared;
 
     private Integer numberOfShares;
     private Integer numberOfRecommendation;
+
+    @OneToOne
+    private User user;
 
     @OneToOne
     private Plan OriginalPlan;

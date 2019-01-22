@@ -1,18 +1,16 @@
 package com.myks790.tourismserver;
 
-import com.myks790.tourismserver.model.Category;
-import com.myks790.tourismserver.model.Place;
-import com.myks790.tourismserver.model.PlaceCategory;
-import com.myks790.tourismserver.model.User;
-import com.myks790.tourismserver.repository.CategoryRepository;
-import com.myks790.tourismserver.repository.PlaceRepository;
-import com.myks790.tourismserver.repository.UserRepository;
+import com.myks790.tourismserver.model.*;
+import com.myks790.tourismserver.repository.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -21,7 +19,10 @@ public class dbTests {
     private UserRepository userRepository;
     @Autowired
     private PlaceRepository placeRepository;
-
+    @Autowired
+    private PlanRepository planRepository;
+    @Autowired
+    private RouteRepository routeRepository;
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -31,6 +32,8 @@ public class dbTests {
         insertUser();
         insertCategory();
         insertPlace();
+        insertPlan();
+        insertRoute();
     }
 
     public void insertUser() {
@@ -75,5 +78,78 @@ public class dbTests {
         }
     }
 
+    public void insertRoute(){
+        String datas[] = {
+                "1	한라산	1	1	힘들겠다",
+                "1	제주동문시장	1	2	맛있겠다",
+                "1	넥슨컴퓨터박물관	2	1",
+                "1	메이즈랜드	2	2",
+                "1	테지움 제주	3	1",
+                "2	월정리해변	1	1",
+                "2	제주동문시장	1	2	시장하구나 시장을가자",
+                "2	제주 절물 자연 휴양림	2	1",
+                "3	한라산	1	1",
+                "3	월정리해변	2	1",
+                "4	제주동문시장	1	1",
+                "4	생각하는 정원	2	1",
+                "4	제주불빛정원	2	2",
+                "4	월정리 해변	2	3	카페카페",
+                "4	제주시 민속 오일시장	3	1",
+                "4	넥슨컴퓨터박물관	3	2",
+                "5	테지움 제주	1	1",
+                "5	제주동문시장	1	2",
+                "6	월정리해변	1	1",
+                "6	넥슨컴퓨터박물관	1	2",
+                "6	한라산	2	1",
+                "6	제주시 민속 오일시장	3	1",
+                "6	제주불빛정원	3	2",
+                "6	메이즈랜드	3	3",
+                "6	테지움 제주	4	1",
+                "6	생각하는 정원	4	2",
+        };
+        for (String data : datas){
+            String[] d = data.split("	");
+            Route route = new Route();
+            route.setPlan(planRepository.findById(Integer.valueOf(d[0])).get());
+            route.setPlace(placeRepository.findByName(d[1]));
+            route.setDay(Integer.valueOf(d[2]));
+            route.setRouteOrder(Integer.valueOf(d[3]));
+            if(d.length == 5)
+                route.setDescription(d[4]);
+            routeRepository.save(route);
+        }
+    }
+
+    public void insertPlan(){
+        String datas[] = {
+                //회원 id 제목	                기간 태그 일정번호 공유수 추천수 공유판단
+                "guest	원범이와 함께하는 힐링 여행	3	카페	1	52	17	1",
+                "guest1	재희의 힐링 여행기	2	힐링	2	48	22	1",
+                "guest2	혜린네 가족여행	2	관광	3	0	0	0",
+                "오현규	2명이 가면 3명이 되어서 돌아오는 제주 여행	3	힐링	4	3	7	1",
+                "guest4	아이돌 강재희의 제주 투어 코스	1	카페	5	17	9	1",
+                "guest	제주 정복 가즈아	4	오름	6	3	6	1",
+                "guest5	3일 여행	3	바다	7	5	14	1",
+                "guest1	제주로의 우정 여행	3	관광	8	0	0	0",
+                "guest2	연예인 제주 투어 코스	1	카페	9	63	41	1",
+                "guest4	제주도 2일 정복	2	관광	10	0	0	0"
+        };
+        for (String data : datas){
+            String[] d = data.split("	");
+            Plan plan = new Plan();
+            plan.setUser(userRepository.findByName(d[0]));
+            plan.setTitle(d[1]);
+            plan.setPeriod(Integer.valueOf(d[2]));
+            List list = new ArrayList();
+            list.add(categoryRepository.findByTitle(d[3]));
+            plan.setCategories(list);
+            plan.setNumberOfShares(Integer.valueOf(d[5]));
+            plan.setNumberOfRecommendation(Integer.valueOf(d[6]));
+            plan.setShared(Boolean.valueOf(d[7]));
+            plan.setOriginalPlan(plan);
+
+            planRepository.save(plan);
+        }
+    }
 
 }

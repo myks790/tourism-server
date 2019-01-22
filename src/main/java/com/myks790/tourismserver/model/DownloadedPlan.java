@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class PersonalPlan {
+public class DownloadedPlan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
