@@ -27,25 +27,33 @@ public class PlanController {
         return planRepository.findAllBySharedIsTrue(pageable);
     }
 
-//    @GetMapping("/find")
-//    public Page<Plan> find(@RequestParam(required = false, defaultValue = "0") Integer page, @RequestParam(required = false, defaultValue = "50") Integer size, @RequestParam(required = false, defaultValue = "id,desc") String sort, @RequestParam(required = true, defaultValue = "PLACE") String classification, @RequestParam(required = false, defaultValue = "") String category, @RequestParam(required = true, defaultValue = "") String keyword){
-//
-//    }
+    @GetMapping("/find")
+    public Page<Plan> find(@RequestParam(required = false, defaultValue = "0") Integer page, @RequestParam(required = false, defaultValue = "50") Integer size, @RequestParam(required = false, defaultValue = "id,desc") String sort, @RequestParam(required = true, defaultValue = "PLACE") String classification, @RequestParam(required = false, defaultValue = "") String category, @RequestParam(required = true, defaultValue = "") String keyword){
+        Pageable pageable = ServiceUtil.makePageRequest(page, size, sort);
+        return planRepository.findAll(pageable);
+    }
+
+    @GetMapping("recommend/{planId}")
+    public Plan recommendPlan(@PathVariable Integer planId){
+        Plan plan = planRepository.getOne(planId);
+        plan.setNumberOfRecommendation(plan.getNumberOfRecommendation() + 1);
+        return planRepository.save(plan);
+    }
 
     @GetMapping("/{planId}")
     public Optional<Plan> get(@PathVariable Integer planId){
         return planRepository.findById(planId);
     }
 
-    @RequestMapping(value = "/{userId}", method = {RequestMethod.POST})
+    @RequestMapping(value = "/", method = {RequestMethod.POST})
     public Plan save(@RequestBody Plan plan) {
         List<Category> categories = plan.getCategories();
         plan.setCategories(categoryRepository.findAllById(categories.stream().map(Category::getId).collect(Collectors.toList())));
         return planRepository.save(plan);
     }
 
-    @DeleteMapping("/{userId}")
-    public void delete(@PathVariable Integer userId) {
-        planRepository.deleteById(userId);
+    @DeleteMapping("/{planId}")
+    public void delete(@PathVariable Integer planId) {
+        planRepository.deleteById(planId);
     }
 }
