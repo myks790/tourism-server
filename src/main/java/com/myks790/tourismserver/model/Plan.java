@@ -35,9 +35,13 @@ public class Plan {
     @OneToOne
     private User user;
 
-    @OneToOne
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    private Plan originalPlan;
+//    @OneToOne
+//    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+//    private Plan originalPlan;
+
+    @OneToMany
+    @JoinColumn(name = "plan_id")
+    private List<Route> routes;
 
     @CreatedDate
     private LocalDateTime createdDate;
