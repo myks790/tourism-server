@@ -4,6 +4,9 @@ services:
   db:
     image: mysql:8.0.13
     restart: always
+    volumes:
+      - tourism-db-volume:/var/lib/mysql
+      - ./sql-dump/dump.sql:/docker-entrypoint-initdb.d/dump.sql
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: tourism
@@ -11,3 +14,5 @@ services:
       MYSQL_PASSWORD: 1234
     ports:
       - 13306:3306
+volumes:
+  tourism-db-volume:
