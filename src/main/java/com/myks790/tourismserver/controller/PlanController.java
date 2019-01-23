@@ -7,6 +7,7 @@ import com.myks790.tourismserver.repository.PlanRepository;
 import com.myks790.tourismserver.util.ServiceUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,14 +21,10 @@ public class PlanController {
     private PlanRepository planRepository;
     private CategoryRepository categoryRepository;
 
-    @GetMapping("/mainList")
-    public List<Plan> mainList(@RequestParam(required = true, defaultValue = "popularity") String classification){
-        if(classification.equals("popularity"))
-            return planRepository.findTop12By();
-        else if(classification.equals("new")){
-            return planRepository.findTop12By();
-        }
-        return null;
+    @GetMapping("/list")
+    public Page<Plan> mainList(@RequestParam(required = false, defaultValue = "0") Integer page, @RequestParam(required = false, defaultValue = "25") Integer size, @RequestParam(required = false, defaultValue = "numberOfRecommendation,desc") String sort,@RequestParam(required = true, defaultValue = "popularity") String classification){
+        Pageable pageable = ServiceUtil.makePageRequest(page, size, sort);
+        return planRepository.findAllBySharedIsTrue(pageable);
     }
 
 //    @GetMapping("/find")
@@ -35,9 +32,9 @@ public class PlanController {
 //
 //    }
 
-    @GetMapping("/{userID}")
-    public Optional<Plan> get(@PathVariable Integer userID){
-        return planRepository.findById(userID);
+    @GetMapping("/{planId}")
+    public Optional<Plan> get(@PathVariable Integer planId){
+        return planRepository.findById(planId);
     }
 
     @RequestMapping(value = "/{userId}", method = {RequestMethod.POST})

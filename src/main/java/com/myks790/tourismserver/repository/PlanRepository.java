@@ -9,7 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PlanRepository extends JpaRepository<Plan, Integer> {
-    List<Plan> findTop12By();
+
+    Page<Plan> findAllBySharedIsTrue(Pageable pageable);
 
     Page<Plan> findAllByCategoriesContainsAndPeriod(List<Category> categories, Integer period, Pageable pageable);
 }

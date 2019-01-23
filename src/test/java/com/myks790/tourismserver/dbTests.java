@@ -145,7 +145,7 @@ public class dbTests {
             plan.setCategories(list);
             plan.setNumberOfShares(Integer.valueOf(d[5]));
             plan.setNumberOfRecommendation(Integer.valueOf(d[6]));
-            plan.setShared(Boolean.valueOf(d[7]));
+            plan.setShared(d[7].equals("1"));
 //            plan.setOriginalPlan(plan);
 
             planRepository.save(plan);
