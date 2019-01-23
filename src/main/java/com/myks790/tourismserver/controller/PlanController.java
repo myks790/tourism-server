@@ -1,6 +1,8 @@
 package com.myks790.tourismserver.controller;
 
+import com.myks790.tourismserver.model.Category;
 import com.myks790.tourismserver.model.Plan;
+import com.myks790.tourismserver.repository.CategoryRepository;
 import com.myks790.tourismserver.repository.PlanRepository;
 import com.myks790.tourismserver.util.ServiceUtil;
 import lombok.AllArgsConstructor;
@@ -9,12 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/plan")
 @AllArgsConstructor
 public class PlanController {
     private PlanRepository planRepository;
+    private CategoryRepository categoryRepository;
 
     @GetMapping("/mainList")
     public List<Plan> mainList(@RequestParam(required = true, defaultValue = "popularity") String classification){
@@ -38,6 +42,8 @@ public class PlanController {
 
     @RequestMapping(value = "/{userId}", method = {RequestMethod.POST})
     public Plan save(@RequestBody Plan plan) {
+        List<Category> categories = plan.getCategories();
+        plan.setCategories(categoryRepository.findAllById(categories.stream().map(Category::getId).collect(Collectors.toList())));
         return planRepository.save(plan);
     }
 
