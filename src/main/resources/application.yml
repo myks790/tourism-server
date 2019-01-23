@@ -1,8 +1,8 @@
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: create
+#  jpa:
+#    hibernate:
+#      ddl-auto: create
   datasource:
-    url: jdbc:mysql://127.0.0.1:13306/tourism?useSSL=false&characterEncoding=utf-8
+    url: jdbc:mysql://127.0.0.1:13306/tourism?useSSL=false&&allowPublicKeyRetrieval=true&characterEncoding=utf-8
     username: tour
     password: 1234
