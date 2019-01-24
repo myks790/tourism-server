@@ -2,8 +2,11 @@ package com.myks790.tourismserver.controller;
 
 import com.myks790.tourismserver.model.Category;
 import com.myks790.tourismserver.model.Plan;
+import com.myks790.tourismserver.model.User;
+import com.myks790.tourismserver.model.projection.PersonalPlan;
 import com.myks790.tourismserver.repository.CategoryRepository;
 import com.myks790.tourismserver.repository.PlanRepository;
+import com.myks790.tourismserver.repository.UserRepository;
 import com.myks790.tourismserver.util.ServiceUtil;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -20,11 +23,12 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/plan")
 @AllArgsConstructor
 public class PlanController {
+    private UserRepository userRepository;
     private PlanRepository planRepository;
     private CategoryRepository categoryRepository;
 
     @GetMapping("/list")
-    public Page<Plan> mainList(@RequestParam(required = false, defaultValue = "0") Integer page, @RequestParam(required = false, defaultValue = "25") Integer size, @RequestParam(required = false, defaultValue = "numberOfRecommendation,desc") String sort, @RequestParam(required = true, defaultValue = "popularity") String classification) {
+    public Page<Plan> list(@RequestParam(required = false, defaultValue = "0") Integer page, @RequestParam(required = false, defaultValue = "25") Integer size, @RequestParam(required = false, defaultValue = "numberOfRecommendation,desc") String sort, @RequestParam(required = true, defaultValue = "popularity") String classification) {
         Pageable pageable = ServiceUtil.makePageRequest(page, size, sort);
         return planRepository.findAllBySharedIsTrue(pageable);
     }
@@ -70,5 +74,11 @@ public class PlanController {
     @DeleteMapping("/{planId}")
     public void delete(@PathVariable Integer planId) {
         planRepository.deleteById(planId);
+    }
+
+    @GetMapping("/personalList/{userId}")
+    public List<PersonalPlan> personalList(@PathVariable Integer userId){
+        User user = userRepository.findById(userId).get();
+        return planRepository.findAllByUser(user);
     }
 }
