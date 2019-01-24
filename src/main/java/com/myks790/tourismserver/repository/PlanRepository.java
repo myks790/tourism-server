@@ -12,5 +12,10 @@ public interface PlanRepository extends JpaRepository<Plan, Integer> {
 
     Page<Plan> findAllBySharedIsTrue(Pageable pageable);
 
-    Page<Plan> findAllByCategoriesContainsAndPeriod(List<Category> categories, Integer period, Pageable pageable);
+    Page<Plan> findAllByTitleLike(String title, Pageable pageable);
+
+    Page<Plan> findAllByPeriod(Integer period, Pageable pageable);
+
+    Page<Plan> findAllByCategoriesInAndPeriod(List<Category> categories, Integer period, Pageable pageable);
+    Page<Plan> findAllByCategoriesInAndTitleLike(List<Category> categories, String title, Pageable pageable);
 }
