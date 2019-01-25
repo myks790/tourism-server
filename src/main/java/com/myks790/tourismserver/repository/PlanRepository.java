@@ -21,6 +21,7 @@ public interface PlanRepository extends JpaRepository<Plan, Integer> {
     Page<Plan> findAllByPeriod(Integer period, Pageable pageable);
 
     Page<Plan> findAllByCategoriesInAndPeriod(List<Category> categories, Integer period, Pageable pageable);
+
     Page<Plan> findAllByCategoriesInAndTitleLike(List<Category> categories, String title, Pageable pageable);
 
     @Query(value = "SELECT new com.myks790.tourismserver.model.projection.PersonalPlan(p, d) FROM Plan as p LEFT JOIN DownloadedPlan as d ON p.id = d.plan WHERE p.user = :user OR d.user = :user")

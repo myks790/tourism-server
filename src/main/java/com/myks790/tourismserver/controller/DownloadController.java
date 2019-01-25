@@ -58,6 +58,12 @@ public class DownloadController {
 
     @DeleteMapping("/{downloadPlanId}")
     public void delete(@PathVariable Integer downloadPlanId) {
+        DownloadedPlan downloadedPlan = downloadedPlanRepository.findById(downloadPlanId).get();
+        Plan plan = downloadedPlan.getPlan();
+        if(plan.getNumberOfRecommendation() > 10){
+            plan.setUser(null);
+            planRepository.save(plan);
+        }
         downloadedPlanRepository.deleteById(downloadPlanId);
     }
 }

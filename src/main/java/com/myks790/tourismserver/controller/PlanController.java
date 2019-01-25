@@ -44,6 +44,7 @@ public class PlanController {
         }else{
             List<Integer> categoryList = Arrays.stream(categories.split("-")).map(Integer::valueOf).collect(Collectors.toList());
             List<Category> selectedCategories = categoryRepository.findAllById(categoryList);
+
             if (classification.equals("PLACE"))
                 return planRepository.findAllByCategoriesInAndTitleLike(selectedCategories,"%" + keyword + "%", pageable);
             else if(StringUtils.isNumeric(keyword))
@@ -84,7 +85,12 @@ public class PlanController {
 
     @DeleteMapping("/{planId}")
     public void delete(@PathVariable Integer planId) {
-        planRepository.deleteById(planId);
+        Plan plan = planRepository.findById(planId).get();
+        if(plan.getNumberOfRecommendation() > 10){
+            plan.setUser(null);
+            planRepository.save(plan);
+        }else
+            planRepository.deleteById(planId);
     }
 
     @GetMapping("/personalList/{userId}")
