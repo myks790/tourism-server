@@ -54,7 +54,7 @@ public class PlanController {
 
     @GetMapping("recommend/{planId}")
     public Plan recommendPlan(@PathVariable Integer planId) {
-        Plan plan = planRepository.getOne(planId);
+        Plan plan = planRepository.findById(planId).get();
         plan.setNumberOfRecommendation(plan.getNumberOfRecommendation() + 1);
         return planRepository.save(plan);
     }
@@ -67,8 +67,19 @@ public class PlanController {
     @RequestMapping(value = "/", method = {RequestMethod.POST})
     public Plan save(@RequestBody Plan plan) {
         List<Category> categories = plan.getCategories();
-        plan.setCategories(categoryRepository.findAllById(categories.stream().map(Category::getId).collect(Collectors.toList())));
-        return planRepository.save(plan);
+        categories = categoryRepository.findAllById(categories.stream().map(Category::getId).collect(Collectors.toList()));
+
+        if (plan.getId() == null){
+            return planRepository.save(plan);
+        }else {
+            Plan temp = planRepository.findById(plan.getId()).get();
+            temp.setTitle(plan.getTitle());
+            temp.setPeriod(plan.getPeriod());
+            temp.setRoutes(plan.getRoutes());
+            temp.setShared(plan.getShared());
+            temp.setCategories(categories);
+            return planRepository.save(temp);
+        }
     }
 
     @DeleteMapping("/{planId}")

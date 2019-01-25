@@ -1,5 +1,8 @@
 package com.myks790.tourismserver.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -26,17 +29,18 @@ public class Plan {
     @JoinColumn(name = "plan_id")
     private List<Category> categories;
 
-    private Boolean shared;
-
-    private Integer numberOfShares;
-    private Integer numberOfRecommendation;
+    private Boolean shared = false;
+    private Integer numberOfShares = 0;
+    private Integer numberOfRecommendation = 0;
 
     @OneToOne
     private User user;
 
-//    @OneToOne
-//    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-//    private Plan originalPlan;
+    @ManyToOne
+    @JsonIgnoreProperties(value = {"originalPlan", "categories"})
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    private Plan originalPlan;
+
 
     @OneToMany
     @JoinColumn(name = "plan_id")
