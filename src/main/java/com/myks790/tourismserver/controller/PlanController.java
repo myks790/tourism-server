@@ -11,6 +11,7 @@ import com.myks790.tourismserver.util.ServiceUtil;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,16 +40,21 @@ public class PlanController {
         if (categories.isEmpty()) {
             if (classification.equals("PLACE"))
                 return planRepository.findAllByTitleLike("%" + keyword + "%", pageable);
-            else if(StringUtils.isNumeric(keyword))
-                return planRepository.findAllByPeriod( Integer.parseInt(keyword), pageable);
-        }else{
-            List<Integer> categoryList = Arrays.stream(categories.split("-")).map(Integer::valueOf).collect(Collectors.toList());
+            else if (StringUtils.isNumeric(keyword))
+                return planRepository.findAllByPeriod(Integer.parseInt(keyword), pageable);
+        } else {
+            List<Integer> categoryList = Arrays.stream(categories.split(",")).map(Integer::valueOf).collect(Collectors.toList());
             List<Category> selectedCategories = categoryRepository.findAllById(categoryList);
-
-            if (classification.equals("PLACE"))
-                return planRepository.findAllByCategoriesInAndTitleLike(selectedCategories,"%" + keyword + "%", pageable);
-            else if(StringUtils.isNumeric(keyword))
-                return planRepository.findAllByCategoriesInAndPeriod(selectedCategories, Integer.parseInt(keyword), pageable);
+            List<Plan> plans = null;
+            if (classification.equals("PLACE")) {
+                plans = planRepository.findAllByCategoriesInAndTitleLike(selectedCategories, "%" + keyword + "%");
+            } else if (StringUtils.isNumeric(keyword)) {
+                plans = planRepository.findAllByCategoriesInAndPeriod(selectedCategories, Integer.parseInt(keyword));
+            }
+            if (plans != null) {
+                List<Plan> result = plans.stream().filter(p -> p.getCategories().containsAll(selectedCategories)).distinct().collect(Collectors.toList());
+                return new PageImpl<Plan>(result, pageable, result.size());
+            }
         }
         return null;
     }
@@ -70,9 +76,9 @@ public class PlanController {
         List<Category> categories = plan.getCategories();
         categories = categoryRepository.findAllById(categories.stream().map(Category::getId).collect(Collectors.toList()));
 
-        if (plan.getId() == null){
+        if (plan.getId() == null) {
             return planRepository.save(plan);
-        }else {
+        } else {
             Plan temp = planRepository.findById(plan.getId()).get();
             temp.setTitle(plan.getTitle());
             temp.setPeriod(plan.getPeriod());
@@ -86,15 +92,15 @@ public class PlanController {
     @DeleteMapping("/{planId}")
     public void delete(@PathVariable Integer planId) {
         Plan plan = planRepository.findById(planId).get();
-        if(plan.getNumberOfRecommendation() > 10){
+        if (plan.getNumberOfRecommendation() > 10) {
             plan.setUser(null);
             planRepository.save(plan);
-        }else
+        } else
             planRepository.deleteById(planId);
     }
 
     @GetMapping("/personalList/{userId}")
-    public List<PersonalPlan> personalList(@PathVariable Integer userId){
+    public List<PersonalPlan> personalList(@PathVariable Integer userId) {
         User user = userRepository.findById(userId).get();
         return planRepository.findAllByUser(user);
     }
